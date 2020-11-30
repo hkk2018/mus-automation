@@ -10,7 +10,7 @@ $playBtnId=9905
 ;ConsoleWrite(ControlGetText($instrumentList, "", 130) & @LF)
 
 
-$msuFilePath="C:\Users\hongk\Desktop\歌譜\23.醉後贈從甥高鎮　【李　白 詩】.mus"
+$msuFilePath=$CmdLine[1]
 ; https://www.autoitscript.com/forum/topic/127349-no-run-the-exe-file/
 ShellExecute($msuFilePath)
 
@@ -20,19 +20,20 @@ While ControlCommand($winTitle, "", $okBtnId, "IsVisible", "")=0
 WEnd
 
 ConsoleWrite("isInstrumentListThere:" & WinExists($instrumentList)& @LF) ;already 1 here
-Sleep(100)
+Sleep(300)
 ControlClick($winTitle,"",$okBtnId)
 
-Sleep(200) ; take break after click
+Sleep(300) ; take break after click
 ControlCommand($instrumentList, "", $instrumentListComboBoxAdvancedMode, "SetCurrentSelection", 5)
 
-Sleep(200)
-$speedStr= ControlGetText ($winTitle, "", $setSpeedCtrlId )
-$speed=Number($speedStr)+40
+Sleep(300)
+;$speedStr= ControlGetText ($winTitle, "", $setSpeedCtrlId )
+;$speed=Number($speedStr)+40
+$speed=$CmdLine[2]
 ControlSetText( $winTitle, "", $setSpeedCtrlId,$speed )
 
-Sleep(200)
+Sleep(300)
 Send("^e")
 
-Sleep(1000)
+Sleep(500)
 ControlClick($winTitle,"",$playBtnId)

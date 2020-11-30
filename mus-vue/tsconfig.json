@@ -12,7 +12,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env"
+      "webpack-env",
+      "nwjs-types",//如果用import的方式報錯並非一個module之類的錯誤，就來這邊填（works）
     ],
     "paths": {
       "@/*": [

@@ -6,13 +6,7 @@ import { setting } from "./setting";
 fileSys
 
 class BackData {
-    users = []; //後台就不用寫定義了，因為都在前台完成操作
-    reportStoragePath: string = 'Reports';
-    programPathObj = {
-        vmz: '',
-        nikon: ''
-    }
-    vmzTimeoutSecond = 90
+    musConfigs: { name: string, speed: number }[] = [];
 }
 let folderName = 'system-data';
 let mainDatafilePath = `${folderName}/${setting.systemDataFileName}`;
@@ -27,12 +21,12 @@ function loadMainData(): BackData {
         if (loadedObj[key] === undefined) loadedObj[key] = (md as any)[key];
         else {
             if (key === 'programPathObj') {
-                const programPathObj = md[key];
-                Object.keys(programPathObj).forEach(keyInClassDef => {
-                    if (loadedObj[key][keyInClassDef] === undefined) {
-                        loadedObj[key][keyInClassDef] = (programPathObj as any)[keyInClassDef];
-                    }
-                })
+                // const programPathObj = md[key];
+                // Object.keys(programPathObj).forEach(keyInClassDef => {
+                //     if (loadedObj[key][keyInClassDef] === undefined) {
+                //         loadedObj[key][keyInClassDef] = (programPathObj as any)[keyInClassDef];
+                //     }
+                // })
             }
         }
     });

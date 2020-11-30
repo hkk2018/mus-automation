@@ -8,8 +8,10 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@types/socket.io-client": "^1.4.34",
     "core-js": "^3.6.5",
     "register-service-worker": "^1.7.1",
+    "socket.io-client": "^2.3.0",
     "vue": "^2.6.11"
   },
   "devDependencies": {
@@ -17,6 +19,7 @@
     "@vue/cli-plugin-pwa": "^4.5.0",
     "@vue/cli-plugin-typescript": "^4.5.0",
     "@vue/cli-service": "^4.5.0",
+    "nwjs-types": "^1.0.0",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
     "typescript": "~3.9.3",

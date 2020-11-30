@@ -5,14 +5,15 @@ import { fileSys } from './file-system.lib';
 import { mainService } from './main.service';
 import { mainData, saveMainData } from './saved.data';
 import io from 'socket.io'; //最新版的會衝到@types的定義，鳥，然後用跟其他興和川專案一樣的版本就解決了
+import { getBs } from './state-for-front.class';
+import { setting } from './setting';
 
 type EventNameToEmit = '';
 
 type ListeningEvent =
     'OPEN_FOLDER'
-    | 'SELECT_FOLDER' | 'CHOOSE_RECIPE' | 'UPDATE_REPORT_PATH'
-    | 'CLOSE_NW' | 'SYNC_VAR' | 'CHOOSE_PROC_PATH' |
-    'INITIAL_DATA' | 'SYNC_BACK_STATE'
+    | 'CLOSE_NW' | 'PLAY_SONG' | 'CHOOSE_PROC_PATH' |
+    'INITIAL_DATA' | 'SYNC_BACK_STATE' | 'SAVE_SONG_CONFIGS';
 
 export let cmsLib = {
     cmsSocket: null as null | io.Socket,
@@ -49,29 +50,12 @@ export let cmsLib = {
             connectedRes();// 最後發現是被chrome的測試版吃走了
 
 
-            if (Object.keys(mainData.programPathObj).some(key => !(mainData.programPathObj as any)[key])) {
-                cmsLib.tellToAlert('請至「Setting」頁之「程式」分頁填寫程式路徑，否則將無法進行重開流程');
-            }
-
-            type VarToSync = 'isDoorOpenCausePause' | 'isLoopingForTransferTesting' | 'isBypassAlignerFailAlarm'
-                | 'isRestartVmzIfTimeout' | 'isAlsoRestartNikonWhenRestartingVmz';
-            interface SnycVarInfo {
-                varName: VarToSync,
-                value: any
-            }
-
-            type KeyOfPathObj = 'nikon' | 'vmz';
-
-
             interface ListenEventInfo {
                 eventName: ListeningEvent;
                 onListened: (data: any, reply: (data: any) => void) => void;
             }
 
-            interface PartialWaferProcData {
-                indexToExecArr: (0 | 1)[],
-                stationSymbolUpperCase: 'A' | 'B' | 'C'
-            }            const eventsToRigister: ListenEventInfo[] = [
+            const eventsToRigister: ListenEventInfo[] = [
                 //--- Main Task
                 //--- generic affairs
                 {
@@ -80,26 +64,6 @@ export let cmsLib = {
                         const dir = 'logs';
                         fileSys.makeIfNoDir(dir);
                         mainService.openFolder(dir);
-                    }
-                },
-                {
-                    eventName: 'SELECT_FOLDER',
-                    onListened: function (data: null, reply: Function) {
-                        mainService.selectFolderP().then(position => {
-                            if (position !== '') {
-                                mainData.reportStoragePath = position;
-                                saveMainData();
-                            }
-                            reply(position);
-                        })
-                    }
-                },
-                {
-                    eventName: 'UPDATE_REPORT_PATH',
-                    onListened: function (path: string, reply: Function) {
-                        mainData.reportStoragePath = path;
-                        saveMainData();
-                        reply(path);
                     }
                 },
                 {
@@ -118,19 +82,28 @@ export let cmsLib = {
                 {
                     eventName: 'INITIAL_DATA',
                     onListened: function (data: null, reply: Function) {
-                        reply({ backData: mainData });
+                        console.log('INITIAL_DATA')
+                        reply({ backData: mainData, backState: getBs() });
                     }
                 },
                 {
-                    eventName: 'CHOOSE_PROC_PATH',
-                    onListened: function (keyOfPathObj: KeyOfPathObj, reply: (programPathObj: any) => void) {
-                        mainService.selectFileP(false).then(path => {
-                            mainData.programPathObj[keyOfPathObj] = path;
-                            saveMainData();
-                            reply(mainData.programPathObj);
-                        })
+                    eventName: 'PLAY_SONG',
+                    onListened: function (path: string, reply: Function) {
+                        const fullPath = setting.musRootFolder + path;
+                        const songName = path.slice(path.lastIndexOf('\\') + 1);
+                        const songConfig = mainData.musConfigs.find(c => c.name === songName);
+                        const songSpeedStr = String(songConfig ? songConfig.speed : 90);
+                        mainService.execFile('exec/mus-ctrl.exe', [fullPath, songSpeedStr]);
                     }
                 },
+                {
+                    eventName: 'SAVE_SONG_CONFIGS',
+                    onListened: function (data: any, reply: Function) {
+                        mainData.musConfigs = data;
+                        saveMainData();
+                    }
+                },
+
                 // {
                 //     eventName: '',
                 //     onListened: function (data: any, reply: Function) { }
