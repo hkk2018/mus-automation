@@ -19,8 +19,13 @@ While ControlCommand($winTitle, "", $okBtnId, "IsVisible", "")=0
    ;ConsoleWrite(ControlCommand($winTitle, "", $okBtnId, "IsVisible", "") & @LF)
 WEnd
 
-ConsoleWrite("isInstrumentListThere:" & WinExists($instrumentList)& @LF) ;already 1 here
 Sleep(300)
+WinActivate($winTitle)
+
+ConsoleWrite("isInstrumentListThere:" & WinExists($instrumentList)& @LF) ;already 1 here
+; why not 300 then detected as virus?
+Sleep(300)
+;ConsoleWrite("keep being detecd as virus if not 300 is annoying")
 ControlClick($winTitle,"",$okBtnId)
 
 Sleep(300) ; take break after click
@@ -35,5 +40,5 @@ ControlSetText( $winTitle, "", $setSpeedCtrlId,$speed )
 Sleep(300)
 Send("^e")
 
-Sleep(500)
+Sleep(300)
 ControlClick($winTitle,"",$playBtnId)
